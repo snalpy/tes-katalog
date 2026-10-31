@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Produk | Iqbal Store</title>
+  <style>
+    :root {
+      --primary: #6c4df6;
+      --primary-dark: #5035d4;
+      --ink: #202033;
+      --muted: #77778b;
+      --surface: #ffffff;
+      --background: #f7f7fc;
+      --border: #ececf4;
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--background);
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav {
+      max-width: 1200px;
+      margin: auto;
+      padding: 17px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { font-size: 1.3rem; font-weight: 850; letter-spacing: -.7px; }
+    .brand span { color: var(--primary); }
+    .nav-links { display: flex; gap: 24px; color: var(--muted); font-size: .94rem; }
+    .nav-links a:hover { color: var(--primary); }
+
+    .hero {
+      max-width: 1200px;
+      margin: 28px auto 0;
+      padding: 0 24px;
+    }
+    .hero-card {
+      min-height: 265px;
+      border-radius: 28px;
+      overflow: hidden;
+      padding: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+      color: #fff;
+      background:
+        radial-gradient(circle at 82% 20%, rgba(255,255,255,.22), transparent 25%),
+        linear-gradient(120deg, #4d35d5 0%, #785df7 58%, #a99aff 100%);
+    }
+    .hero-copy { max-width: 580px; }
+    .eyebrow {
+      display: inline-block;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.25);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+    h1 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.08; margin: 17px 0 12px; letter-spacing: -1.5px; }
+    .hero p { color: rgba(255,255,255,.85); line-height: 1.7; margin: 0 0 22px; max-width: 480px; }
+    .hero-button {
+      display: inline-block;
+      background: #fff;
+      color: var(--primary-dark);
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 750;
+      transition: transform .2s;
+    }
+    .hero-button:hover { transform: translateY(-2px); }
+    .hero-emoji { font-size: clamp(5rem, 11vw, 9rem); filter: drop-shadow(0 15px 15px rgba(25,15,90,.2)); margin-right: 3%; }
+
+    main { max-width: 1200px; margin: auto; padding: 34px 24px 60px; }
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    .section-heading h2 { margin: 0 0 6px; font-size: clamp(1.45rem, 3vw, 2rem); letter-spacing: -.7px; }
+    .section-heading p { color: var(--muted); margin: 0; font-size: .95rem; }
+    .search {
+      width: min(310px, 100%);
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 15px;
+      outline: none;
+      transition: border .2s, box-shadow .2s;
+    }
+    .search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,77,246,.1); }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 23px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 9px; }
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: #5f5f73;
+      border-radius: 999px;
+      padding: 9px 15px;
+      cursor: pointer;
+      transition: .2s;
+    }
+    .filter-btn:hover, .filter-btn.active { color: #fff; background: var(--primary); border-color: var(--primary); }
+    .result-count { color: var(--muted); font-size: .88rem; white-space: nowrap; }
+
+    /* 4 kolom desktop, 2 kolom tablet/HP */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+    .product-card {
+      background: var(--surface);
+      border: 1px solid rgba(30,30,60,.045);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 5px 22px rgba(28,25,70,.045);
+      transition: transform .25s, box-shadow .25s;
+      min-width: 0;
+    }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 14px 32px rgba(28,25,70,.11); }
+    .product-image {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: #eeeafc;
+    }
+    .product-image img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform .45s;
+    }
+    .product-card:hover .product-image img { transform: scale(1.06); }
+    .badge {
+      position: absolute; left: 12px; top: 12px;
+      background: #fff; color: var(--primary-dark);
+      padding: 6px 9px; border-radius: 8px;
+      font-size: .72rem; font-weight: 800;
+      box-shadow: 0 3px 10px rgba(0,0,0,.08);
+    }
+    .product-info { padding: 16px; }
+    .category { color: var(--primary); font-size: .75rem; font-weight: 750; text-transform: uppercase; letter-spacing: .7px; }
+    .product-info h3 { font-size: 1rem; margin: 7px 0 6px; line-height: 1.35; }
+    .description { color: var(--muted); font-size: .83rem; line-height: 1.55; margin: 0 0 14px; min-height: 39px; }
+    .price-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+    .price { font-size: 1.02rem; font-weight: 850; }
+    .old-price { display: block; color: #a3a3b1; text-decoration: line-through; font-size: .76rem; margin-top: 3px; }
+    .rating { font-size: .78rem; color: #77778b; white-space: nowrap; }
+    .rating span { color: #f4a623; }
+    .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn {
+      border: 1px solid var(--primary);
+      padding: 10px 8px; border-radius: 10px;
+      font-size: .8rem; font-weight: 750; cursor: pointer;
+      text-align: center; transition: .2s;
+    }
+    .btn-outline { color: var(--primary); background: #fff; }
+    .btn-outline:hover { background: #f2efff; }
+    .btn-primary { color: #fff; background: var(--primary); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .empty { display: none; text-align: center; padding: 45px 15px; color: var(--muted); background: #fff; border-radius: var(--radius); }
+
+    footer { background: #201b3b; color: #fff; padding: 28px 24px; text-align: center; }
+    footer p { color: #c6c2d9; margin: 7px 0 0; font-size: .88rem; }
+    .toast {
+      position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px);
+      background: #201b3b; color: #fff; padding: 13px 18px; border-radius: 12px;
+      opacity: 0; pointer-events: none; transition: .25s; z-index: 30;
+      box-shadow: 0 8px 25px rgba(0,0,0,.2); font-size: .9rem;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 950px) {
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+      .hero-card { padding: 32px; }
+      .nav-links { gap: 14px; }
+    }
+    @media (max-width: 560px) {
+      .nav { padding: 14px 16px; }
+      .nav-links { display: none; }
+      .hero { padding: 0 14px; margin-top: 16px; }
+      .hero-card { min-height: 240px; padding: 25px 22px; border-radius: 22px; }
+      .hero-emoji { font-size: 4rem; margin: 0; }
+      .hero p { font-size: .9rem; }
+      main { padding: 30px 14px 45px; }
+      .section-heading { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      .toolbar { align-items: flex-start; flex-direction: column; }
+      .product-grid { gap: 12px; }
+      .product-info { padding: 12px; }
+      .product-info h3 { font-size: .91rem; }
+      .description { font-size: .77rem; min-height: 48px; }
+      .price { font-size: .91rem; }
+      .rating { font-size: .7rem; }
+      .card-actions { grid-template-columns: 1fr; }
+      .btn { padding: 9px 5px; }
+      .badge { left: 8px; top: 8px; font-size: .66rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav">
+      <a class="brand" href="#">IQBAL<span>STORE.</span></a>
+      <div class="nav-links">
+        <a href="#beranda">Beranda</a>
+        <a href="#katalog">Katalog</a>
+        <a href="#kontak">Kontak</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero" id="beranda">
+    <div class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">KOLEKSI PILIHAN</span>
+        <h1>Temukan produk<br>favoritmu.</h1>
+        <p>Koleksi pilihan dengan kualitas terbaik dan tampilan yang cocok untuk gaya sehari-hari.</p>
+        <a href="#katalog" class="hero-button">Jelajahi Katalog &rarr;</a>
+      </div>
+      <div class="hero-emoji" aria-hidden="true">🛍️</div>
+    </div>
+  </section>
+
+  <main id="katalog">
+    <div class="section-heading">
+      <div>
+        <h2>Katalog Produk</h2>
+        <p>Pilih produk favoritmu dari koleksi kami.</p>
+      </div>
+      <input class="search" id="searchInput" type="search" placeholder="Cari nama produk..." aria-label="Cari produk">
+    </div>
+
+    <div class="toolbar">
+      <div class="filters" aria-label="Filter kategori">
+        <button class="filter-btn active" data-category="Semua">Semua</button>
+        <button class="filter-btn" data-category="Fashion">Fashion</button>
+        <button class="filter-btn" data-category="Elektronik">Elektronik</button>
+        <button class="filter-btn" data-category="Aksesoris">Aksesoris</button>
+        <button class="filter-btn" data-category="Lifestyle">Lifestyle</button>
+      </div>
+      <span class="result-count" id="resultCount">8 produk</span>
+    </div>
+
+    <section class="product-grid" id="productGrid" aria-label="Daftar produk">
+      <!-- Ganti gambar, nama, kategori, deskripsi, dan harga sesuai katalog Anda. -->
+      <article class="product-card" data-category="Fashion" data-name="Sneakers Urban">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=85" alt="Sneakers merah" loading="lazy">
+          <span class="badge">Terlaris</span>
+        </div>
+        <div class="product-info">
+          <span class="category">Fashion</span>
+          <h3>Sneakers Urban</h3>
+          <p class="description">Sepatu kasual nyaman untuk aktivitas harian.</p>
+          <div class="price-row"><div class="price">Rp349.000 <span class="old-price">Rp429.000</span></div><div class="rating"><span>★</span> 4.9</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Elektronik" data-name="Headphone Wireless">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=85" alt="Headphone wireless" loading="lazy">
+          <span class="badge">Pilihan</span>
+        </div>
+        <div class="product-info">
+          <span class="category">Elektronik</span>
+          <h3>Headphone Wireless</h3>
+          <p class="description">Audio jernih dengan desain modern dan nyaman.</p>
+          <div class="price-row"><div class="price">Rp275.000</div><div class="rating"><span>★</span> 4.8</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Aksesoris" data-name="Jam Minimalis">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=85" alt="Jam tangan minimalis" loading="lazy">
+        </div>
+        <div class="product-info">
+          <span class="category">Aksesoris</span>
+          <h3>Jam Minimalis</h3>
+          <p class="description">Jam elegan dengan desain sederhana dan klasik.</p>
+          <div class="price-row"><div class="price">Rp420.000</div><div class="rating"><span>★</span> 4.7</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Lifestyle" data-name="Botol Minum">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=700&q=85" alt="Botol minum" loading="lazy">
+          <span class="badge">Baru</span>
+        </div>
+        <div class="product-info">
+          <span class="category">Lifestyle</span>
+          <h3>Botol Minum</h3>
+          <p class="description">Teman praktis untuk menemani kegiatanmu.</p>
+          <div class="price-row"><div class="price">Rp89.000</div><div class="rating"><span>★</span> 4.8</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Fashion" data-name="Tas Harian">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=700&q=85" alt="Tas wanita" loading="lazy">
+        </div>
+        <div class="product-info">
+          <span class="category">Fashion</span>
+          <h3>Tas Harian</h3>
+          <p class="description">Tas serbaguna dengan ruang penyimpanan praktis.</p>
+          <div class="price-row"><div class="price">Rp229.000</div><div class="rating"><span>★</span> 4.9</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Elektronik" data-name="Kamera Instan">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=700&q=85" alt="Kamera digital" loading="lazy">
+        </div>
+        <div class="product-info">
+          <span class="category">Elektronik</span>
+          <h3>Kamera Instan</h3>
+          <p class="description">Abadikan momen berharga dengan mudah.</p>
+          <div class="price-row"><div class="price">Rp1.250.000</div><div class="rating"><span>★</span> 4.8</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Aksesoris" data-name="Kacamata Modern">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=700&q=85" alt="Kacamata hitam" loading="lazy">
+        </div>
+        <div class="product-info">
+          <span class="category">Aksesoris</span>
+          <h3>Kacamata Modern</h3>
+          <p class="description">Sentuhan gaya simpel untuk penampilanmu.</p>
+          <div class="price-row"><div class="price">Rp159.000</div><div class="rating"><span>★</span> 4.6</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Lifestyle" data-name="Kopi Premium">
+        <div class="product-image">
+          <img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=700&q=85" alt="Kopi di meja" loading="lazy">
+          <span class="badge">Favorit</span>
+        </div>
+        <div class="product-info">
+          <span class="category">Lifestyle</span>
+          <h3>Kopi Premium</h3>
+          <p class="description">Pilihan kopi nikmat untuk waktu santaimu.</p>
+          <div class="price-row"><div class="price">Rp75.000</div><div class="rating"><span>★</span> 4.9</div></div>
+          <div class="card-actions"><button class="btn btn-outline detail-btn">Lihat Detail</button><button class="btn btn-primary buy-btn">Beli Sekarang</button></div>
+        </div>
+      </article>
+    </section>
+    <div class="empty" id="emptyState">Produk tidak ditemukan. Coba kata kunci atau kategori lain.</div>
+  </main>
+
+  <footer id="kontak">
+    <strong>IQBALSTORE.</strong>
+    <p>Katalog produk pilihan untuk kebutuhan sehari-hari.</p>
+    <p>&copy; <span id="year"></span> Iqbal Store. Semua hak dilindungi.</p>
+  </footer>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const cards = [...document.querySelectorAll('.product-card')];
+    const filterButtons = [...document.querySelectorAll('.filter-btn')];
+    const resultCount = document.getElementById('resultCount');
+    const emptyState = document.getElementById('emptyState');
+    const toast = document.getElementById('toast');
+    let activeCategory = 'Semua';
+    let toastTimer;
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function filterProducts() {
+      const query = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+      cards.forEach(card => {
+        const matchesCategory = activeCategory === 'Semua' || card.dataset.category === activeCategory;
+        const matchesSearch = card.dataset.name.toLowerCase().includes(query) ||
+          card.querySelector('.description').textContent.toLowerCase().includes(query);
+        const show = matchesCategory && matchesSearch;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      resultCount.textContent = `${visible} produk`;
+      emptyState.style.display = visible ? 'none' : 'block';
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        activeCategory = button.dataset.category;
+        filterProducts();
+      });
+    });
+    searchInput.addEventListener('input', filterProducts);
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    cards.forEach(card => {
+      const name = card.dataset.name;
+      const price = card.querySelector('.price').childNodes[0].textContent.trim();
+      card.querySelector('.detail-btn').addEventListener('click', () => {
+        showToast(`${name} — ${card.querySelector('.description').textContent}`);
+      });
+      card.querySelector('.buy-btn').addEventListener('click', () => {
+        // Ganti nomor WhatsApp di bawah dengan nomor toko Anda, format kode negara tanpa tanda +.
+        const nomorWhatsApp = '6281234567890';
+        const pesan = `Halo, saya tertarik membeli ${name} dengan harga ${price}. Apakah produk tersedia?`;
+        if (nomorWhatsApp === '6281234567890') {
+          showToast('Silakan ganti nomor WhatsApp contoh di kode HTML terlebih dahulu.');
+        } else {
+          window.open(`https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(pesan)}`, '_blank', 'noopener');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
